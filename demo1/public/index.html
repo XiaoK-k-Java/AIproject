@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <meta name="description" content="蛇环 SERPENT ORBIT — 360° 自由转向的实时吞噬蛇竞技场。撞上对手的身体，你的一切将散落成猎物。">
+  <title>蛇环 · SERPENT ORBIT</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body data-view="lobby">
+  <div class="ambient" aria-hidden="true">
+    <span class="ambient-orb ambient-orb-a"></span>
+    <span class="ambient-orb ambient-orb-b"></span>
+    <span class="ambient-orb ambient-orb-c"></span>
+    <span class="ambient-grid"></span>
+  </div>
+
+  <canvas id="arena" aria-label="蛇环游戏竞技场"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <div class="hud" id="hud">
+    <header class="topbar">
+      <div class="brand" aria-label="蛇环 SERPENT ORBIT">
+        <span class="brand-mark" aria-hidden="true">
+          <i class="brand-ring"></i>
+          <i class="brand-dot"></i>
+          <i class="brand-core"></i>
+        </span>
+        <span class="brand-type">
+          <strong>SERPENT<span>°</span>ORBIT</strong>
+          <small>环域蛇行 / 360° ARENA</small>
+        </span>
+      </div>
+
+      <div class="top-actions">
+        <span class="net-pill" id="netPill">
+          <i></i>
+          <span id="netText">正在连接</span>
+        </span>
+        <button class="icon-btn" id="soundBtn" type="button" aria-label="切换声音" title="切换声音">
+          <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4Z"></path>
+            <path d="M16.5 8.5a5 5 0 0 1 0 7"></path>
+            <path d="M19 6a8.5 8.5 0 0 1 0 12"></path>
+          </svg>
+          <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4Z"></path>
+            <path d="m16 9 5 6M21 9l-5 6"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="player-panel glass game-only" id="playerPanel">
+      <div class="panel-edge"></div>
+      <div class="player-head">
+        <span class="snake-avatar" id="snakeAvatar" aria-hidden="true"><i></i></span>
+        <div class="player-meta">
+          <span class="eyebrow">YOU / 你的蛇</span>
+          <strong id="playerName">—</strong>
+        </div>
+        <span class="rank-badge" id="rankBadge">#—</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <span>积分</span>
+          <strong id="statScore">0</strong>
+        </div>
+        <div class="stat">
+          <span>长度</span>
+          <strong><span id="statLength">0</span><small>m</small></strong>
+        </div>
+        <div class="stat">
+          <span>猎杀</span>
+          <strong id="statKills">0</strong>
+        </div>
+      </div>
+      <div class="energy-row">
+        <div class="energy-track"><span class="energy-fill" id="energyFill"></span></div>
+        <span class="energy-label">BOOST <b id="energyText">100</b>%</span>
+      </div>
+    </section>
+
+    <aside class="leaderboard glass game-only" aria-label="实时排行榜">
+      <div class="leaderboard-head">
+        <div>
+          <span class="eyebrow">LIVE / 实时</span>
+          <h2>环域排行榜</h2>
+        </div>
+        <span class="alive-badge"><i></i><span id="aliveCount">0</span></span>
+      </div>
+      <ol class="leader-list" id="leaderList"></ol>
+    </aside>
+
+    <div class="killfeed game-only" id="killfeed" aria-live="polite"></div>
+
+    <div class="map-panel game-only">
+      <div class="map-heading"><span>环域地图</span><small>ZONE MAP</small></div>
+      <div class="map-frame">
+        <canvas id="minimap" width="320" height="320" aria-label="环域小地图"></canvas>
+        <span class="map-scan"></span>
+      </div>
+    </div>
+
+    <div class="control-hint game-only">
+      <span><kbd>鼠标</kbd> 指向转向</span>
+      <span><kbd>Shift</kbd> 冲刺</span>
+      <span><kbd>WASD</kbd> 导航</span>
+    </div>
+
+    <div class="control-zone game-only" id="controlZone">
+      <button class="boost-btn" id="boostBtn" type="button" aria-label="按住冲刺">
+        <span class="boost-ring" id="boostRing"></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M13.2 2 5 13h5.1L9 22l8.9-11.8h-5.3L13.2 2Z"></path>
+        </svg>
+        <span class="boost-label">冲刺</span>
+      </button>
+
+      <div class="joystick" id="joystick" role="presentation">
+        <span class="joy-ticks" aria-hidden="true"></span>
+        <span class="joy-needle" id="joyNeedle" aria-hidden="true"></span>
+        <span class="joy-core" aria-hidden="true"></span>
+        <span class="joy-knob" id="joyKnob" aria-hidden="true"><i></i></span>
+        <span class="joy-label">360°</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="screen lobby is-active" id="lobby">
+    <div class="lobby-shade" aria-hidden="true"></div>
+    <div class="screen-inner lobby-inner">
+      <div class="hero">
+        <div class="hero-top">
+          <span class="hero-kicker"><i class="live-dot"></i> 360° 自由转向 · 实时吞噬竞技场</span>
+          <h1>
+            <span class="hero-cn">蛇环</span>
+            <span class="hero-en">SERPENT<br>ORBIT</span>
+          </h1>
+          <p class="hero-copy">没有格子，没有死角。<br>只凭一条命，穿过整片环域。</p>
+        </div>
+
+        <div class="hero-bottom">
+          <div class="feature-list">
+            <span><i>01</i> 360° 罗盘转向</span>
+            <span><i>02</i> 撞身即亡</span>
+            <span><i>03</i> 吞噬成长</span>
+            <span><i>04</i> 实时对抗</span>
+            <span><i>05</i> AI 战术复盘</span>
+          </div>
+          <p class="hero-footnote">撞上别人的身体，你的一切会散落成猎物。<br>抢在所有蛇之前，把它们吞回去。</p>
+        </div>
+      </div>
+
+      <aside class="join-panel glass">
+        <div class="panel-topline">
+          <span>ENTER THE ORBIT</span>
+          <span class="status-live"><i></i>LIVE</span>
+        </div>
+        <h2>进入环域</h2>
+        <p class="panel-desc">取一个代号，选一道光。<br>小心，你的头比想象中更脆弱。</p>
+
+        <form id="joinForm" novalidate>
+          <label class="field-label" for="nameInput">你的代号</label>
+          <div class="name-field">
+            <span class="name-prompt">//</span>
+            <input id="nameInput" name="name" type="text" maxlength="10" placeholder="无名蛇" autocomplete="off" spellcheck="false">
+            <span class="name-count" id="nameCount">0/10</span>
+          </div>
+
+          <fieldset class="color-field">
+            <legend>霓虹光谱</legend>
+            <div class="swatches" id="colorPalette" role="group" aria-label="选择蛇的颜色">
+              <button type="button" class="swatch is-selected" data-color="#5ef2e4" style="--sw:#5ef2e4" aria-label="极光青" aria-pressed="true"><i></i></button>
+              <button type="button" class="swatch" data-color="#ff6b8a" style="--sw:#ff6b8a" aria-label="脉冲粉" aria-pressed="false"><i></i></button>
+              <button type="button" class="swatch" data-color="#a78bfa" style="--sw:#a78bfa" aria-label="电离紫" aria-pressed="false"><i></i></button>
+              <button type="button" class="swatch" data-color="#ffd166" style="--sw:#ffd166" aria-label="日冕金" aria-pressed="false"><i></i></button>
+              <button type="button" class="swatch" data-color="#b6f36b" style="--sw:#b6f36b" aria-label="酸蚀绿" aria-pressed="false"><i></i></button>
+              <button type="button" class="swatch" data-color="#6cb8ff" style="--sw:#6cb8ff" aria-label="深蓝彗星" aria-pressed="false"><i></i></button>
+              <button type="button" class="swatch" data-color="#ff9e5e" style="--sw:#ff9e5e" aria-label="日蚀橙" aria-pressed="false"><i></i></button>
+              <button type="button" class="swatch" data-color="#ff8fe0" style="--sw:#ff8fe0" aria-label="星云洋红" aria-pressed="false"><i></i></button>
+            </div>
+          </fieldset>
+
+          <button class="primary-btn join-btn" id="joinBtn" type="submit">
+            <span class="btn-label">进入猎场</span>
+            <span class="btn-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"></path></svg>
+            </span>
+            <span class="btn-loader" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <div class="join-meta">
+          <div>
+            <span>PERSONAL BEST</span>
+            <strong id="bestScore">—</strong>
+          </div>
+          <div>
+            <span>IN THE ORBIT</span>
+            <strong><b id="lobbyAlive">0</b> 条蛇</strong>
+          </div>
+        </div>
+
+        <div class="panel-controls">
+          <span><kbd>鼠标</kbd> / 罗盘转向</span>
+          <span><kbd>空格</kbd> 冲刺</span>
+        </div>
+
+        <div class="lobby-live" id="lobbyLive" aria-live="polite">
+          <span class="lobby-live-title">LIVE FEED</span>
+          <div class="lobby-live-list" id="lobbyLiveList"></div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="lobby-footer">
+      <span>NO GRID. NO MERCY.</span>
+      <span class="footer-mid">头部撞到对手身体即出局 · 积分按比例散落</span>
+      <span>v1.0 / ORBIT</span>
+    </footer>
+  </section>
+
+  <section class="screen death-screen" id="deathScreen">
+    <div class="death-card glass">
+      <span class="death-code"><i></i>SIGNAL LOST</span>
+      <h2 id="deathTitle">你被吞噬了</h2>
+      <p class="death-reason" id="deathReason">你的蛇头撞上了对手的身体。</p>
+
+      <div class="death-score">
+        <span>本局积分</span>
+        <strong id="deathScore">0</strong>
+        <em id="bestBadge">NEW RECORD</em>
+      </div>
+
+      <div class="death-stats">
+        <div><span>存活时长</span><strong id="deathTime">0s</strong></div>
+        <div><span>最终长度</span><strong id="deathLength">0m</strong></div>
+        <div><span>最高排名</span><strong id="deathRank">#—</strong></div>
+      </div>
+
+      <div class="ai-coach is-loading" id="aiCoach">
+        <div class="ai-coach-top">
+          <span class="ai-coach-title"><i></i>战术推演 <small>AI COACH</small></span>
+          <span class="ai-coach-mode" id="aiCoachMode">分析中</span>
+        </div>
+        <p class="ai-coach-text" id="aiCoachText" aria-live="polite">正在分析本局航迹…</p>
+      </div>
+
+      <div class="death-actions">
+        <button class="primary-btn" id="respawnBtn" type="button">
+          <span class="btn-label">再次进入环域</span>
+          <span class="btn-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"></path></svg>
+          </span>
+          <span class="btn-loader" aria-hidden="true"></span>
+        </button>
+        <button class="ghost-btn" id="leaveBtn" type="button">返回大厅</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="connect-banner" id="connectBanner">
+    <i></i>
+    <span>星链断开，正在重新接入环域…</span>
+  </div>
+  <div class="death-flash" id="deathFlash" aria-hidden="true"></div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
