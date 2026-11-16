@@ -9,7 +9,7 @@ def root():
     print("欢迎访问我的第一个FastAPI的应用程序")
     return {"message": "Hello World"}
 
-@app.get("/user")
+@app.get("/users")
 def user():
     print("查询所用用户信息")
     return [{"id": 1, "name": "xk", "age": 20},{"id": 2, "name": "xxk", "age": 19}]
