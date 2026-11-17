@@ -51,12 +51,20 @@ async def load_presets() -> ApiResponse:
     #返回数据
     return ApiResponse(code=200,message="伴侣预设模板加载成功",data=presets_list)
 
+#声明函数
+#生成会话名称
+def generate_session_name():
+    return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+#获取会话文件名
+def get_session_file_name(session_name):
+    return SESSION_DIR+"/"+session_name+".json"
+
 #创建会话
 @app.post("/api/sessions",summary="创建会话")
 async def create_sessinon(request:CreateSessionModel) -> ApiResponse:
     print(f"创建会话,{request.nick_name}:{request.nature}")
     #生成会话名称-->当前时间
-    session_name=datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    session_name=generate_session_name()
 
     #将该会话的数据信息保存到文件中
     session_data={
@@ -66,7 +74,7 @@ async def create_sessinon(request:CreateSessionModel) -> ApiResponse:
         "messages":[]
     }
 
-    with open(SESSION_DIR+"/"+session_name+".json","w",encoding="UTF-8") as f:
+    with open(get_session_file_name(session_name),"w",encoding="UTF-8") as f:
         json.dump(session_data,f,ensure_ascii=False,indent=4)
 
     return ApiResponse(code=200,message="创建会话成功",data=session_name)
