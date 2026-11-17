@@ -376,6 +376,7 @@ function renderMessages() {
     }
     
     state.messages.forEach(msg => {
+        if (msg.role === 'system') return; // 跳过系统提示词，不渲染
         appendMessageToUI(msg.role, msg.content);
     });
     
