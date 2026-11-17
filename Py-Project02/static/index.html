@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI智能伴侣</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" type="image/svg+xml">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🤖 AI控制面板</h2>
+            </div>
+
+            <!-- 分割线 -->
+            <hr class="divider">
+
+            <!-- 新建会话按钮 -->
+            <button class="btn btn-primary btn-full" id="newSessionBtn">
+                <span>✏️</span> 新建会话
+            </button>
+
+            <!-- 会话历史 -->
+            <div class="session-section">
+                <h3>会话历史</h3>
+                <div class="session-list" id="sessionList">
+                    <!-- 会话列表将动态生成 -->
+                </div>
+            </div>
+
+            <!-- 分割线 -->
+            <hr class="divider">
+
+            <!-- 伴侣信息 -->
+            <div class="companion-section">
+                <h3>伴侣信息</h3>
+                <div class="form-group">
+                    <label for="presetSelect">选择预设</label>
+                    <select id="presetSelect" class="form-select">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nickName">昵称</label>
+                    <input type="text" id="nickName" placeholder="请输入昵称" value="小甜甜">
+                </div>
+                <div class="form-group">
+                    <label for="nature">性格</label>
+                    <textarea id="nature" placeholder="请输入性格" rows="4">活泼开朗的东北姑娘</textarea>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主聊天区域 -->
+        <main class="chat-container">
+            <!-- 标题栏 -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <h1>AI智能伴侣</h1>
+                    <span class="session-name" id="sessionName">会话名称: </span>
+                </div>
+                <div class="theme-switcher">
+                    <button class="btn btn-theme" id="themeBtn" title="切换背景色">
+                        <span>🎨</span>
+                    </button>
+                    <div class="theme-dropdown" id="themeDropdown">
+                        <div class="theme-option" data-theme="light">
+                            <span class="theme-color theme-light"></span>
+                            <span>白色</span>
+                        </div>
+                        <div class="theme-option" data-theme="dark">
+                            <span class="theme-color theme-dark"></span>
+                            <span>暗黑</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 聊天消息区域 -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- 消息将动态生成 -->
+            </div>
+            
+            <!-- 输入区域 -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" 
+                           class="chat-input" 
+                           id="chatInput" 
+                           placeholder="请输入您要问的问题"
+                           autocomplete="off">
+                    <button class="btn btn-send" id="sendBtn">
+                        <span>➤</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 右侧项目介绍栏 -->
+        <aside class="info-sidebar">
+            <div class="info-header">
+                <h2>🤖 项目介绍</h2>
+            </div>
+
+            <div class="info-content">
+                <div class="info-section">
+                    <p><strong>AI智能伴侣 是一款基于人工智能的情感陪伴应用，通过先进的自然语言处理技术，为你打造专属的虚拟伴侣体验。</strong></p>
+                </div>
+
+                <div class="info-section">
+                    <h3>🎮 核心玩法</h3>
+                    <p>你可以为AI伴侣设置昵称和性格，她会以对应的人设与你进行自然、温馨的对话。无论是分享日常、倾诉心事，还是闲聊打发时间，她都能给你温暖的回应。</p>
+                </div>
+
+                <div class="info-section">
+                    <h3>✨ 特色功能</h3>
+                    <ul class="feature-list">
+                        <li><strong>个性定制：</strong>自由设定伴侣昵称与性格，打造独一无二的专属伴侣</li>
+                        <li><strong>智能对话：</strong>基于DeepSeek大模型，对话自然流畅，情感细腻</li>
+                        <li><strong>会话记忆：</strong>自动保存聊天记录，随时回顾温馨时刻</li>
+                        <li><strong>多会话管理：</strong>支持创建多个会话，体验不同风格的陪伴</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>🎯 适合人群</h3>
+                    <ul class="audience-list">
+                        <li>渴望情感交流的用户</li>
+                        <li>AI技术爱好者</li>
+                        <li>日常解压与陪伴需求者</li>
+                    </ul>
+                </div>
+
+                <div class="info-section footer-text">
+                    <p><strong>开启你的AI陪伴之旅，感受科技带来的温暖与关怀！</strong></p>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>
