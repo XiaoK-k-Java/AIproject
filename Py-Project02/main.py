@@ -170,6 +170,24 @@ async def chat(request: ChatRequestModel) -> ApiResponse:
     return ApiResponse(code=200, message="操作成功", data=ai_response)
 
 
+#加载历史会话列表
+@app.get("/api/sessions",summary="加载历史会话列表")
+async def load_sessions() -> ApiResponse:
+    print("加载历史会话列表")
+
+    session_list=[]
+
+    file_list = os.listdir(SESSION_DIR)#把文件下的文件名存进去
+    for file_name in file_list:
+        session_list.append(file_name[:-5])
+
+    #按照最新的时间进行排序
+    session_list.sort(reverse=True)
+
+    return ApiResponse(code=200,message="操作成功", data=session_list)
+
+
+
 if __name__ == "__main__":
     import uvicorn
 
