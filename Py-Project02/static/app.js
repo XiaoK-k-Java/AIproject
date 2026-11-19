@@ -78,12 +78,14 @@ function bindEventListeners() {
         state.nickName = e.target.value || '小甜甜';
         // 根据当前的昵称和性格查找匹配的预设
         updatePresetSelection();
+        applyPersonaChange();
     });
-    
+
     elements.nature.addEventListener('change', (e) => {
         state.nature = e.target.value || '活泼开朗的东北姑娘';
         // 根据当前的昵称和性格查找匹配的预设
         updatePresetSelection();
+        applyPersonaChange();
     });
     
     // 主题切换
@@ -234,7 +236,7 @@ function renderSessionList(sessions) {
 
 async function loadSession(sessionId, refreshList = true) {
     try {
-        const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`);
+        const response = await fetch(`${API_BASE_URL}/session/${sessionId}`);
         const result = await response.json();
         
         if (result.code !== 200) {
@@ -554,14 +556,30 @@ function handlePresetChange(presetId) {
     if (!presetId) {
         return;
     }
-    
+
     const preset = presetsData.find(p => p.id == presetId);
     if (preset) {
         state.nickName = preset.nick_name;
         state.nature = preset.nature;
-        
+
         elements.nickName.value = preset.nick_name;
         elements.nature.value = preset.nature;
+
+        applyPersonaChange();
+    }
+}
+
+// 根据当前的昵称和性格，同步预设下拉框的选中项
+function updatePresetSelection() {
+    const match = presetsData.find(p => p.nick_name === state.nickName && p.nature === state.nature);
+    elements.presetSelect.value = match ? match.id : '';
+}
+
+// 切换人设后，如果当前会话已有聊天记录，自动新建会话
+// 避免旧的历史消息（旧人设的回复）让AI继续维持旧人设
+async function applyPersonaChange() {
+    if (state.currentSession && state.messages.length > 0) {
+        await createNewSession();
     }
 }
 
