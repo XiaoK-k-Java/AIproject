@@ -4,10 +4,10 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI,Request
 from openai import OpenAI
 from pydantic import BaseModel
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 #日志
@@ -232,6 +232,23 @@ async def delete_session(session_name:str) -> ApiResponse:
     os.remove(session_file_name)
 
     return ApiResponse(code=200,message="删除指定会话成功", data=None)
+
+
+
+
+
+
+
+
+
+
+@app.exception_handler(Exception)
+async def exception_handler(request: Request, exc: Exception):   #request 封装的是请求数据; exc 封装的是错误信息
+    logging.error(f"请求路径:{request.url},错误信息:{exc}")
+    return JSONResponse(content={"code":500,"message":"服务端异常，请处理","data":None})
+
+
+
 
 if __name__ == "__main__":
     import uvicorn
