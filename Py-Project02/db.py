@@ -9,7 +9,7 @@ engine = create_async_engine("mysql+aiomysql://root:1234@localhost:3306/ai_partn
 # 2. 声明模型类
 Base = declarative_base()
 class AiPreset(Base):
-    """伴侣预设表"""
+    #伴侣预设表
     __tablename__ = "ai_preset"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, comment="主键")
@@ -24,7 +24,7 @@ class AiPreset(Base):
 
 
 class AiSession(Base):
-    """会话表"""
+    #会话表
     __tablename__ = "ai_session"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, comment="主键")
@@ -39,7 +39,7 @@ class AiSession(Base):
 
 
 class AiMessage(Base):
-    """消息表"""
+    #消息表
     __tablename__ = "ai_message"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, comment="主键")
